@@ -1,1 +1,1 @@
-# Adatbazisrendszerek-II
+# Adatbazisrendszerek-II - IWWD97
