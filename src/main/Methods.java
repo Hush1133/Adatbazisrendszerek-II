@@ -19,13 +19,13 @@ public class Methods {
         int i = sc.nextInt();
         switch (i) {
             case 1:
-                String sqlp= "insert into Oromlany(Id,Nev,Szulido,Szulhely,Szepsegindex,Vakumhatas) values(?,?,?,?,?,?)";
+                String sqlp= "insert into Oromlany(Id,Nev,Szulido,Szulhely,Szepsegindex,Vakumhatas) values(?,?,?,?,?,?)"; //kétfázis
                 try {
                     PreparedStatement ps = conn.prepareStatement(sqlp);
                     SM("Kérem a személy id-jét: ");
                     ps.setInt(1, sc.nextInt());
                     SM("Kérem a Nevet: ");
-                    ps.setString(2, sc.next());
+                    ps.setString(2, sc.next());                                 //uj adatok bevitele
                     SM("Kérem a szuletési idejét: ");
                     ps.setString(3, sc.next());
                     SM("Kérem a Születésihelyét: ");
@@ -78,7 +78,7 @@ public class Methods {
         try {
             s =  conn.createStatement();
             RS = s.executeQuery(sqlp);
-            while(RS.next()) {
+            while(RS.next()) {       //Kurzor
                 id = RS.getInt("Id");
                 nev = RS.getString("Nev");
                 szulido = RS.getString("Szulido");
@@ -302,7 +302,7 @@ public class Methods {
             while(RS.next()) {
                 pc= RS.getInt("pc");
             }
-        } catch (SQLException e) {
+        } catch (SQLException e) {                                                    //Bejelntkezesi modul
             SM(e.getMessage());
         }
         return pc;
@@ -472,7 +472,7 @@ public class Methods {
     }
     public void Connect() {
         try {
-            String url = "jdbc:sqlite:C:/Users/User-Pc/Documents/GitHub/Kadar_Konrad_JDBC_felevesfeladat/kadar jdbc/bordelyhaz.db";
+            String url = "jdbc:sqlite:C:/Users/KDY/Desktop/Kadar_Konrad_JDBC_felevesfeladat/kadar jdbc/bordelyhaz.db/";
             conn = DriverManager.getConnection(url);
             SM("Connection ok!");
         }catch (SQLException e) {
@@ -569,7 +569,7 @@ public class Methods {
         String columnNamePattern=null;
         String schemaPattern=null;
 
-        SM("Mely táblának szeretnéd lekérni a metaadatát? \n 1.Örömlány \n 2.Vásárló" );
+        SM("Mely táblának szeretnéd lekérni a metaadatát? \n 1.Örömlány \n 2.Vásárló" ); //meta
         int i = sc.nextInt();
         switch (i) {
             case 1:
