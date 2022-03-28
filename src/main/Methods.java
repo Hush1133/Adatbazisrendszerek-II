@@ -1,5 +1,8 @@
 package main;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Collections;
 import java.util.Scanner;
@@ -504,7 +507,7 @@ public class Methods {
         Bejelent(name, psw);
         while (1!=0) {
             SM("Hello " + name + " ! Mit szeretnél csinálni? \n 1.Örömlány tábla megtekintése \n 2.Vásárló tábla megtekintése "
-                    + "\n 3.Egy tábla egy sorának megtekintése \n 4.Új adatok felvitele \n 5.Törlés \n 6.Adatok módosítása \n 7.Driveradatok lekérése \n 8.Tábla adatok lekérése \n 0.Kilépés");
+                    + "\n 3.Egy tábla egy sorának megtekintése \n 4.Új adatok felvitele \n 5.Törlés \n 6.Adatok módosítása \n 7.Driveradatok lekérése \n 8.Tábla adatok lekérése \n 9.tábla adat mentése \n 0.Kilépés");
             int i = sc.nextInt();
             switch (i) {
                 case 0:
@@ -536,17 +539,37 @@ public class Methods {
                 case 8:
                     metaDataTableQuery();
                     break;
+                case 9:
+                    exportdb();
+                    break;
                 default:
                     System.out.println("Nincs ilyen opció!");
             }
         }
     }
+
+    private void exportdb() {
+        SM("Mely táblát szeretnéd lementeni csv-be? \n 1.Örömlány \n 2.Vásárló" );
+        int i = sc.nextInt();
+        switch (i) {
+            case 1:
+                exportdbOromlany();
+                break;
+            case 2:
+               exportdbVasarlo();
+                break;
+            default:
+                System.out.println("Nincs ilyen tábla!");
+                break;
+        }
+    }
+
     private void metaDataTableQuery(){
         String catalog= null;
         String columnNamePattern=null;
         String schemaPattern=null;
 
-        SM("Mely táblába szeretne felvinni uj adatokat? \n 1.Örömlány \n 2.Vásárló" );
+        SM("Mely táblának szeretnéd lekérni a metaadatát? \n 1.Örömlány \n 2.Vásárló" );
         int i = sc.nextInt();
         switch (i) {
             case 1:
@@ -593,52 +616,72 @@ public class Methods {
         }
     }
 
-    /*private void exportdb(){
-        try (Connection connection = DriverManager.getConnection(jdbcURL, username, password)) {
-            String sql = "SELECT * FROM review";
-
-            Statement statement = connection.createStatement();
-
-            ResultSet result = statement.executeQuery(sql);
-
+    private void exportdbOromlany(){
+        String csvFilePath = "oromlany.csv";
+        String nev ="", szulido="", szulhely="", x="\t";
+        int id=0, szepsegIndex=0, vakumHatas=0;
+        try {
             BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
 
             // write header line containing column names
-            fileWriter.write("course_name,student_name,timestamp,rating,comment");
+            fileWriter.write("Id,Név,Születésidő,Születésihely,SzépségIndex,Vákumhatás");
+            String sqlp= "select id,nev,szulido,szulhely,szepsegIndex,vakumHatas from Oromlany";
 
-            while (result.next()) {
-                String courseName = result.getString("course_name");
-                String studentName = result.getString("student_name");
-                float rating = result.getFloat("rating");
-                Timestamp timestamp = result.getTimestamp("timestamp");
-                String comment = result.getString("comment");
-
-                if (comment == null) {
-                    comment = "";   // write empty value for null
-                } else {
-                    comment = "\"" + comment + "\""; // escape double quotes
-                }
-
-                String line = String.format("\"%s\",%s,%.1f,%s,%s",
-                        courseName, studentName, rating, timestamp, comment);
-
+            s =  conn.createStatement();
+            RS = s.executeQuery(sqlp);
+            while(RS.next()) {
+                id = RS.getInt("Id");
+                nev = RS.getString("Nev");
+                szulido = RS.getString("Szulido");
+                szulhely = RS.getString("Szulhely");
+                szepsegIndex= RS.getInt("Szepsegindex");
+                vakumHatas= RS.getInt("Vakumhatas");
+                SM(id+x+nev+x+szulido+x+szulhely+x+szepsegIndex+x+vakumHatas);
                 fileWriter.newLine();
+                String line = String.format("%s, %s,%s,%s,%s,%s",
+                        id,nev, szulido, szulhely, szepsegIndex, vakumHatas);
                 fileWriter.write(line);
             }
-
-            statement.close();
+            s.close();
             fileWriter.close();
-
-        } catch (SQLException e) {
-            System.out.println("Datababse error:");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("File IO error:");
-            e.printStackTrace();
-        }
-
+            RS.close();
+        } catch (SQLException e ) {SM(e.getMessage());}
+        catch (IOException e ) {SM(e.getMessage());}
     }
-    }*/
+
+    private void exportdbVasarlo(){
+        String nev="", szulido="", szulhely="", fizetesiMod="", x="\t";
+        int id =0,oromlanyid=0;
+
+        String csvFilePath = "Vasarlo.csv";
+        try {
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
+
+            // write header line containing column names
+            fileWriter.write("Id,Név,Születésidő,Születésihely,Fizetesimod,Örömlányid");
+            String sqlp= "select Id,Szulhely,Nev,Szulido,Fizetesimod,oromlanyid from Vasarlo";
+
+            s =  conn.createStatement();
+            RS = s.executeQuery(sqlp);
+            while(RS.next()) {
+                id= RS.getInt("Id");
+                oromlanyid = RS.getInt("oromlanyid");
+                nev = RS.getString("Nev");
+                szulido = RS.getString("Szulido");
+                szulhely = RS.getString("Szulhely");
+                fizetesiMod = RS.getString("Fizetesimod");
+                SM(id+x+nev+x+szulido+x+szulhely+x+szulido+x+fizetesiMod+x+oromlanyid);
+                fileWriter.newLine();
+                String line = String.format("%s,%s,%s,%s,%s,%s",
+                        id,nev, szulido, szulhely, fizetesiMod, oromlanyid);
+                fileWriter.write(line);
+            }
+            s.close();
+            fileWriter.close();
+            RS.close();
+        } catch (SQLException e ) {SM(e.getMessage());}
+        catch (IOException e ) {SM(e.getMessage());}
+    }
 
     public void SM(String msg){
         System.out.println(msg);
