@@ -1,12 +1,8 @@
 package main;
 
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Collections;
 import java.util.Scanner;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class Methods {
     private Statement s = null;
@@ -473,7 +469,7 @@ public class Methods {
     }
     public void Connect() {
         try {
-            String url = "jdbc:sqlite:C:/Users/User-Pc/Desktop/kadar jdbc/bordelyhaz.db";
+            String url = "jdbc:sqlite:C:/Users/User-Pc/Documents/GitHub/Kadar_Konrad_JDBC_felevesfeladat/kadar jdbc/bordelyhaz.db";
             conn = DriverManager.getConnection(url);
             SM("Connection ok!");
         }catch (SQLException e) {
@@ -498,7 +494,7 @@ public class Methods {
         }
 
     }
-    public void menu() {
+    public void menu(){
         Reg();
         Connect();
         System.out.println("Bejelentkezés: ");
@@ -508,7 +504,7 @@ public class Methods {
         Bejelent(name, psw);
         while (1!=0) {
             SM("Hello " + name + " ! Mit szeretnél csinálni? \n 1.Örömlány tábla megtekintése \n 2.Vásárló tábla megtekintése "
-                    + "\n 3.Egy tábla egy sorának megtekintése \n 4.Új adatok felvitele \n 5.Törlés \n 6.Adatok módosítása \n 0.Kilépés");
+                    + "\n 3.Egy tábla egy sorának megtekintése \n 4.Új adatok felvitele \n 5.Törlés \n 6.Adatok módosítása \n 7.Driveradatok lekérése \n 8.Tábla adatok lekérése \n 0.Kilépés");
             int i = sc.nextInt();
             switch (i) {
                 case 0:
@@ -534,11 +530,116 @@ public class Methods {
                 case 6:
                     Change();
                     break;
+                case  7:
+                    jdbcDriverquery();
+                    break;
+                case 8:
+                    metaDataTableQuery();
+                    break;
                 default:
                     System.out.println("Nincs ilyen opció!");
             }
         }
     }
+    private void metaDataTableQuery(){
+        String catalog= null;
+        String columnNamePattern=null;
+        String schemaPattern=null;
+
+        SM("Mely táblába szeretne felvinni uj adatokat? \n 1.Örömlány \n 2.Vásárló" );
+        int i = sc.nextInt();
+        switch (i) {
+            case 1:
+                try {
+                    DatabaseMetaData databaseMetaData = conn.getMetaData();
+                    RS=databaseMetaData.getColumns(catalog,schemaPattern,"Oromlany",columnNamePattern);
+                    SM( "Örömlány oszlopai ");
+                    while (RS.next()) {
+                        System.out.println(RS.getString("COLUMN_NAME"));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                try {
+                    DatabaseMetaData databaseMetaData = conn.getMetaData();
+                    RS=databaseMetaData.getColumns(catalog,schemaPattern,"Vasarlo",columnNamePattern);
+                    SM( "Vásárló oszlopai ");
+                    while (RS.next()) {
+                        System.out.println(RS.getString("COLUMN_NAME"));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            default:
+                System.out.println("Nincs ilyen tábla!");
+                break;
+        }
+    }
+
+    private void jdbcDriverquery(){
+
+        try {
+            DatabaseMetaData databaseMetaData = conn.getMetaData();
+
+            System.out.println("JDBC Driver Name " + databaseMetaData.getDriverName());
+            System.out.println("JDBC Driver version " + databaseMetaData.getDriverVersion());
+            System.out.println("JDBC MajorVersion " + databaseMetaData.getDriverMajorVersion());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*private void exportdb(){
+        try (Connection connection = DriverManager.getConnection(jdbcURL, username, password)) {
+            String sql = "SELECT * FROM review";
+
+            Statement statement = connection.createStatement();
+
+            ResultSet result = statement.executeQuery(sql);
+
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(csvFilePath));
+
+            // write header line containing column names
+            fileWriter.write("course_name,student_name,timestamp,rating,comment");
+
+            while (result.next()) {
+                String courseName = result.getString("course_name");
+                String studentName = result.getString("student_name");
+                float rating = result.getFloat("rating");
+                Timestamp timestamp = result.getTimestamp("timestamp");
+                String comment = result.getString("comment");
+
+                if (comment == null) {
+                    comment = "";   // write empty value for null
+                } else {
+                    comment = "\"" + comment + "\""; // escape double quotes
+                }
+
+                String line = String.format("\"%s\",%s,%.1f,%s,%s",
+                        courseName, studentName, rating, timestamp, comment);
+
+                fileWriter.newLine();
+                fileWriter.write(line);
+            }
+
+            statement.close();
+            fileWriter.close();
+
+        } catch (SQLException e) {
+            System.out.println("Datababse error:");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("File IO error:");
+            e.printStackTrace();
+        }
+
+    }
+    }*/
+
     public void SM(String msg){
         System.out.println(msg);
     }
