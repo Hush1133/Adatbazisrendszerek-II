@@ -1,0 +1,7 @@
+Id,Nev,Szulido,Szulhely,Fizetesimod,oromlanyid
+1,Gyula,2000.03.02,Gyula,KP,
+2,József,1980.06.20,Budapest,CD,
+3,Gabi,2001.10.02,Kecskemet,KP,
+4,János,1995.03.05,Pest,CD,
+5,Béla,1990.06.20,Györ,KP,
+6,Ferenc,1995.07.16,Gyula,KP,
